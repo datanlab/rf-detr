@@ -114,6 +114,8 @@ for img_id, img_name in enumerate(sorted(os.listdir(IMG_DIR)), 1):
     elif ".png" in img_name:
         mask_path = os.path.join(MASK_DIR, img_name.replace(".png", "_mask.png"))
 
+    if not os.path.exists(mask_path):
+        continue
     shutil.copy(img_path, dst_img_dir)
     shutil.copy(mask_path, dst_img_dir)
 
