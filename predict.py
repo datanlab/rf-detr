@@ -4,10 +4,10 @@ import cv2
 import os
 
 model = RFDETRSegPreview(
-    pretrain_weights="/media/anlab/500ssd/datdt/rf-detr/pretrained_checkpoint/checkpoint0149.pth"
+    pretrain_weights="./pretrained_checkpoint/checkpoint0149.pth"
 )
 
-dir = "/media/anlab/500ssd/datdt/rf-detr/Input"
+dir = "./Input"
 img_paths = [os.path.join(dir, img_name) for img_name in os.listdir(dir)]
 
 output = "Output"
