@@ -1,3 +1,15 @@
+# Install enviroment
+## 1. Create conda environment
+```
+conda create -n rfdetr python=3.12
+```
+
+## 2. Install requirement libraries
+```
+conda activate rfdetr
+pip install -r requirements.txt
+```
+
 # Prepare training data
 Prepare datasets folder including data and mask folders
 ## 1. Augment data
