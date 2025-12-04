@@ -27,7 +27,7 @@ MAX_SIZE_RATIO = 0.55  # crop lớn nhất bằng 70% ảnh gốc
 # Augmentation Function
 # ============================
 def apply_augment(image, mask):
-    aug_type = random.choice(["none", "flip_h", "flip_v", "rotate", "shear"])
+    aug_type = random.choice(["none", "flip_h", "flip_v", "rotate", "dark"])
 
     if aug_type == "flip_h":
         image = ImageOps.mirror(image)
@@ -42,13 +42,11 @@ def apply_augment(image, mask):
         image = image.rotate(angle, expand=True)
         mask = mask.rotate(angle, expand=True)
 
-    # elif aug_type == "shear":
-    #     shear_factor = random.uniform(-0.3, 0.3)  # độ xiên
-    #     w, h = image.size
-    #     matrix = (1, shear_factor, 0, 0, 1, 0)
-
-    #     image = image.transform((w, h), Image.AFFINE, matrix, resample=Image.BICUBIC)
-    #     mask = mask.transform((w, h), Image.AFFINE, matrix, resample=Image.NEAREST)
+    elif aug_type == "dark":
+        factor = random.uniform(0.3, 0.7)  #dark factor coefficient
+        image_np = np.array(image).astype(np.float32)
+        image_np = np.clip(image_np * factor, 0, 255).astype(np.uint8)
+        image = Image.fromarray(image_np)
 
     return image, mask
 
