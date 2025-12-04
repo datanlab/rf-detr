@@ -4,10 +4,10 @@ import cv2
 import os
 
 model = RFDETRSegPreview(
-    pretrain_weights="/home/ubuntu/work_dir/rf-detr/run/checkpoint.pth"
+    pretrain_weights="/media/anlab/500ssd/datdt/rf-detr/pretrained_checkpoint/checkpoint0149.pth"
 )
 
-dir = "/home/ubuntu/work_dir/rf-detr/Input"
+dir = "/media/anlab/500ssd/datdt/rf-detr/Input"
 img_paths = [os.path.join(dir, img_name) for img_name in os.listdir(dir)]
 
 output = "Output"
@@ -15,12 +15,18 @@ compare = "Compare"
 output = compare
 os.makedirs(output, exist_ok=True)
 
+brightness_factor = 0.6
 for img_path in img_paths:
     basename = os.path.basename(img_path)
     image = cv2.imread(img_path, cv2.COLOR_GRAY2BGR)
+    darker = np.clip(image * brightness_factor, 0, 255).astype(np.uint8)
+    image = darker
+    import time
+    start = time.time()
     detections = model.predict(image)
-
-    print(detections)
+    end = time.time()
+    print(f"Processed {basename} in {end - start:.2f} seconds")
+    # print(detections)
 
     masks = detections.mask
     bboxes = detections.xyxy
@@ -28,16 +34,6 @@ for img_path in img_paths:
     class_ids = detections.class_id
 
     num_instances = masks.shape[0]
-    print("Num masks:", num_instances)
-
-    # for i in range(num_instances):
-    #     mask_bool = masks[i]  # shape (H, W), bool
-    #     mask = mask_bool.astype(np.uint8) * 255
-
-    #     out_path = f"./{output}/mask_{basename}"
-    #     cv2.imwrite(out_path, mask)
-
-    #     print("Saved:", out_path)
     h, w = image.shape[:2]
     overlay = image.copy()
 
@@ -51,8 +47,6 @@ for img_path in img_paths:
     # alpha blend 40%
     blended = cv2.addWeighted(overlay, 0.4, image, 0.6, 0)
 
-    # ====== Ghép ảnh trái-phải ======
-    # Resize overlay cho cùng chiều cao ảnh input
     if blended.shape[0] != image.shape[0]:
         blended = cv2.resize(blended, (w, h))
 
