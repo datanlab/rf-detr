@@ -15,18 +15,23 @@ compare = "Compare"
 output = compare
 os.makedirs(output, exist_ok=True)
 
+images = []
 brightness_factor = 0.6
 for img_path in img_paths:
     basename = os.path.basename(img_path)
     image = cv2.imread(img_path, cv2.COLOR_GRAY2BGR)
     darker = np.clip(image * brightness_factor, 0, 255).astype(np.uint8)
     image = darker
-    import time
-    start = time.time()
-    detections = model.predict(image)
-    end = time.time()
-    print(f"Processed {basename} in {end - start:.2f} seconds")
-    # print(detections)
+    images.append(image)
+    if len(images) == 49: break
+
+import time
+start = time.time()
+results = model.predict(images)
+end = time.time()
+print(f"Processed in {end - start:.2f} seconds")
+
+for i, detections in enumerate(results):
 
     masks = detections.mask
     bboxes = detections.xyxy
@@ -56,3 +61,4 @@ for img_path in img_paths:
     out_file = os.path.join(output, f"vis_{basename}")
     cv2.imwrite(out_file, combined)
     print("Saved:", out_file)
+
